@@ -7,6 +7,9 @@ from src import library_db
 class BookTestCase(unittest.TestCase):
     def setUp(self):
         self.app = library_db.app.test_client()
+        self.headers = {
+            'Content-Type': 'application/json'
+        }
         self.book = {
             'title': 'Test Book',
             'author': 'Test Author'
@@ -14,7 +17,7 @@ class BookTestCase(unittest.TestCase):
 
     def test_add_book(self):
         # send a POST request to the add_book endpoint with the book data
-        response = self.app.post('/api/books', data=json.dumps(self.book), content_type='application/json')
+        response = self.app.post('/api/books', data=json.dumps(self.book), headers=self.headers)
 
         # check that the response status code is 201 (created)
         self.assertEqual(response.status_code, 201)
@@ -34,7 +37,7 @@ class BookTestCase(unittest.TestCase):
 
         # Act
         for book in books:
-            response = self.app.post('/api/books', data=json.dumps(book), content_type='application/json')
+            response = self.app.post('/api/books', data=json.dumps(book), headers=self.headers)
 
             # Assert
             self.assertEqual(response.status_code, 201)
