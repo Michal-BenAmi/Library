@@ -3,6 +3,9 @@ from flask import Flask
 from flask_oauthlib.provider import OAuth2Provider
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
+from flask_httpauth import HTTPBasicAuth
+
+auth = HTTPBasicAuth()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://libuser:library123@localhost/library_management'
@@ -45,6 +48,10 @@ class User(db.Model):
     email = db.Column(db.String(100), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
+    def check_password(self, password):
+        # return check_password_hash(self.password_hash, password)
+        return True
+
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -59,3 +66,13 @@ users_schema = UserSchema(many=True)
 
 checkout_schema = CheckoutSchema()
 checkouts_schema = CheckoutSchema(many=True)
+
+
+@auth.verify_password
+def verify_password(username, password):
+    user = User.query.filter_by(username=username).first()
+    if user and user.check_password(password) and user.password == password:
+        return True
+    return False
+
+

@@ -1,8 +1,48 @@
 import re
 
-from flask import request, make_response, jsonify
+from flask import request, make_response, jsonify, g
 
 from src.library_db_schema import *
+from functools import wraps
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        username = request.authorization.username
+        user = User.query.filter_by(username=username).first()
+        is_admin = user.is_admin
+        if not is_admin:
+            return make_response(jsonify({'message': 'Unauthorized access. Admin rights required.'}), 401)
+        return f(*args, **kwargs)
+    return decorated
+
+
+def authenticate_user(username, password):
+    user = User.query.filter_by(username=username).first()
+    if user and user.check_password(password):
+        return user
+    return None
+
+
+def authenticate(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        user = get_current_user()
+        g.user = user.id
+        if 'user_id' in kwargs and g.user != kwargs['user_id']:
+            return jsonify({'message': 'Unauthorized access. Different user.'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+
+def get_current_user():
+    auth = request.authorization
+    if not auth or not authenticate_user(auth.username, auth.password):
+        return jsonify({'message': 'Unauthorized access'}), 401
+    user = User.query.filter_by(username=auth.username).first()
+    g.user = user.id
+    return user
 
 
 def get_user_book_count(user_id):
@@ -41,6 +81,8 @@ def register():
 
 # API to remove a registered user
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
+@auth.login_required
+@admin_required
 def delete_user(user_id):
     user = User.query.get(user_id)
     if user is None:
@@ -78,8 +120,6 @@ def get_books():
 @app.route('/api/books/<int:book_id>', methods=['GET'])
 def get_book(book_id):
     book = Book.query.get(book_id)
-    print(book_id)
-    print(book)
     if not book:
         return make_response("Invalid book", 400)
     return make_response(book_schema.jsonify(book), 200)
@@ -87,11 +127,12 @@ def get_book(book_id):
 
 # API to add a new book
 @app.route('/api/books', methods=['POST'])
+@auth.login_required
+@admin_required
 def add_book():
     title = request.json['title'].strip() if request.json['title'] else None
     author = request.json['author'].strip() if request.json['author'] else None
 
-    print(request)
     if not title:
         return make_response("Invalid book title", 400)
     if not author:
@@ -107,6 +148,8 @@ def add_book():
 
 # API to remove a book
 @app.route('/api/books/<int:book_id>', methods=['DELETE'])
+@auth.login_required
+@admin_required
 def remove_book(book_id):
     book = Book.query.get(book_id)
 
@@ -120,14 +163,17 @@ def remove_book(book_id):
 
 # API to checkout book for user
 @app.route('/api/checkout', methods=['POST'])
+@auth.login_required
 def checkout_book():
-    user_id = request.json['user_id']
+    user = get_current_user()
+
+    # user id can be part of the request or from th auth token user
+    user_id = request.json.get('user_id', user.id)
     book_id = request.json['book_id']
 
-    if not user_id or not book_id:
-        return make_response("Missing parameter user or book in the request", 400)
+    if not book_id:
+        return make_response("Missing parameter book in the request", 400)
 
-    user = User.query.get(user_id)
     book = Book.query.get(book_id)
 
     if not user or not book:
@@ -153,6 +199,7 @@ def checkout_book():
 
 # API to return a book from user
 @app.route('/api/checkouts/<int:book_id>', methods=['PUT'])
+@auth.login_required
 def return_book(book_id):
     if not book_id:
         return make_response("Missing parameter book in the request", 400)
@@ -172,24 +219,42 @@ def return_book(book_id):
 
 # API to get all the checkouts
 @app.route('/api/checkouts', methods=['GET'])
+@auth.login_required
+@admin_required
 def get_checkouts():
     checkouts = Checkout.query.all()
-    return make_response(checkouts_schema.jsonify(checkouts), 200)
+    result = []
+    for checkout in checkouts:
+        user = User.query.get(checkout.user_id)
+        result.append({
+            'checkout_id': checkout.id,
+            'book_id': checkout.book_id,
+            'user_id': checkout.user_id,
+            'user_name': user.username,
+            'checkout_date': checkout.checkout_date
+        })
+    return make_response(jsonify({'checkouts': result}), 200)
 
 
 # API to get all the checkouts for user
-@app.route('/api/checkouts/<int:user_id>', methods=['GET'])
-def get_checkouts_by_user(user_id):
+@app.route('/api/checkouts/me', methods=['GET'])
+@auth.login_required
+@authenticate
+def get_checkouts_by_user():
     try:
+        user = get_current_user()
+        user_id = user.id
         checkouts = Checkout.query.filter_by(user_id=user_id).all()
         if not checkouts:
             return make_response("No checkouts found for the user id provided", 404)
+        # user = User.query.get(user_id)
         result = []
         for checkout in checkouts:
             result.append({
                 'checkout_id': checkout.id,
                 'book_id': checkout.book_id,
                 'user_id': checkout.user_id,
+                'user_name': user.username,
                 'checkout_date': checkout.checkout_date
             })
         return jsonify({'checkouts': result}), 200
@@ -197,8 +262,6 @@ def get_checkouts_by_user(user_id):
         return make_response("Error get_checkouts_by_user", 500)
 
 
-# API to allow a user to view if they owe a fine and how much it is
-@app.route('/api/fines/<int:user_id>', methods=['GET'])
 def get_user_fines(user_id):
     if not user_id:
         return make_response("Missing parameter user_id", 400)
@@ -215,6 +278,21 @@ def get_user_fines(user_id):
             fine_amount += days_overdue * 0.10
 
     return make_response(jsonify({"user_id": user_id, "fine_amount": fine_amount}), 200)
+
+
+# API to allow a user to view if they owe a fine and how much it is
+@app.route('/api/fines/<int:user_id>', methods=['GET'])
+@auth.login_required
+def get_user_id_fines(user_id):
+    return get_user_fines(user_id)
+
+
+# API to allow a user to view if they owe a fine and how much it is
+@app.route('/api/fines/me', methods=['GET'])
+@auth.login_required
+def get_my_fines():
+    user = get_current_user()
+    return get_user_fines(user.id)
 
 
 if __name__ == '__main__':
