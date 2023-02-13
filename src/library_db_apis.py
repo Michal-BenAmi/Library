@@ -152,7 +152,8 @@ def add_book():
 @admin_required
 def remove_book(book_id):
     book = Book.query.get(book_id)
-
+    if not book:
+        return make_response("Book doesnt exist", 400)
     try:
         db.session.delete(book)
         db.session.commit()
@@ -180,10 +181,10 @@ def checkout_book():
         return make_response("Invalid user or book", 400)
 
     if get_user_book_count(user_id) >= 10:
-        return make_response("User has already checked out the maximum number of books (10)", 500)
+        return make_response("User has already checked out the maximum number of books (10)", 400)
 
     if not book.is_available:
-        return make_response("Book is not available for checkout", 500)
+        return make_response("Book is not available for checkout", 400)
 
     checked = Checkout(book_id=book_id, user_id=user_id)
     book = Book.query.get(book_id)
@@ -192,7 +193,7 @@ def checkout_book():
         db.session.add(checked)
         db.session.commit()
 
-        return jsonify({"id": checked.id, "user_id": user_id, "book_id": book_id, "checkout_date": checked.checkout_date}), 201
+        return make_response(jsonify({"id": checked.id, "user_id": user_id, "book_id": book_id, "checkout_date": checked.checkout_date}), 201)
     except:
         return make_response("Error checking out book", 500)
 
@@ -206,12 +207,16 @@ def return_book(book_id):
     book = Book.query.get(book_id)
     if not book:
         return make_response("Invalid book", 400)
+    if book.is_available:
+        return make_response("Book is already available to checkout", 400)
 
     try:
-        checkout = Checkout.query.get(book_id)
+        checkout = Checkout.query.filter_by(book_id=book.id).first()
+        if not checkout:
+            return make_response("checkout was not found", 400)
         db.session.delete(checkout)
-        db.session.commit()
         book.is_available = True
+        db.session.commit()
         return make_response(book_schema.jsonify(book), 200)
     except:
         return make_response("Error returning book", 500)
@@ -247,7 +252,6 @@ def get_checkouts_by_user():
         checkouts = Checkout.query.filter_by(user_id=user_id).all()
         if not checkouts:
             return make_response("No checkouts found for the user id provided", 404)
-        # user = User.query.get(user_id)
         result = []
         for checkout in checkouts:
             result.append({
@@ -273,7 +277,7 @@ def get_user_fines(user_id):
     fine_amount = 0
 
     for checkout in checkouts:
-        days_overdue = (datetime.now() - checkout.checkout_date).days - 14
+        days_overdue = (datetime.now().date() - checkout.checkout_date).days - 14
         if days_overdue > 0:
             fine_amount += days_overdue * 0.10
 
@@ -283,11 +287,12 @@ def get_user_fines(user_id):
 # API to allow a user to view if they owe a fine and how much it is
 @app.route('/api/fines/<int:user_id>', methods=['GET'])
 @auth.login_required
+@admin_required
 def get_user_id_fines(user_id):
     return get_user_fines(user_id)
 
 
-# API to allow a user to view if they owe a fine and how much it is
+# API to allow a user to view his fines and how much
 @app.route('/api/fines/me', methods=['GET'])
 @auth.login_required
 def get_my_fines():
@@ -298,6 +303,9 @@ def get_my_fines():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+
+        # db.session.remove()
+        # db.drop_all()
     app.run(debug=True)
 
 

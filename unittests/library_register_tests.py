@@ -12,15 +12,13 @@ class TestRegisterAPI(unittest.TestCase):
 
     def test_register_api(self):
         user = {
-            "username": "Shir Cohen",
-            "email": "ShirCohen@gmail.com",
-            "password": "Shircohen123"
+            "username": "Shiri Cohen",
+            "email": "ShiriCohen@gmail.com",
+            "password": "Shiricohen123"
         }
 
         # Send a POST request to the API with the user data
         response = self.app.post("http://localhost:5000/api/register", headers=self.headers, data=json.dumps(user))
-        print(response.request.url)
-        print(response.text)
 
         # Check that the API returns a 201 status code, indicating that the user has been successfully registered
         self.assertEqual(response.status_code, 201)
@@ -52,6 +50,11 @@ class TestRegisterAPI(unittest.TestCase):
                 "email": "RachelRu@yahho.com",
                 "password": "Rachel!!Ru123"
             },
+            {
+                "username": "Shimon Bor",
+                "email": "Shimon_Boru@gmail.com",
+                "password": "ShimonBor!123"
+            }
         ]
 
         for user in users:
@@ -105,6 +108,23 @@ class TestRegisterAPI(unittest.TestCase):
 
         # Check that the API returns
         self.assertEqual(response.status_code, 400)
+
+    def test_delete_user(self):
+        # Test deleting user by regular user
+        auth = ('Joni Levy', 'JoniLevy123')
+        response = self.app.delete('/api/users/2', headers=self.headers, auth=auth)
+        # Unauthorized Access
+        self.assertEqual(response.status_code, 401)
+
+        # Test deleting user by admin
+        auth = ('Rivka Gim', 'RivkaGim12345')
+        response = self.app.delete('/api/users/2', headers=self.headers, auth=auth)
+        self.assertEqual(response.status_code, 204)
+
+        # Test user not found
+        response = self.app.delete('/api/users/2', headers=self.headers, auth=auth)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.text, 'User not found')
 
 
 if __name__ == '__main__':

@@ -11,24 +11,36 @@ class BookTestCase(unittest.TestCase):
         self.headers = {
             'Content-Type': 'application/json'
         }
-        self.book = {
+        self.auth = ('Joni Levy', 'JoniLevy123')
+        self.auth_admin = ('Rivka Gim', 'RivkaGim12345')
+
+    def test_add_book(self):
+        # Test to add a book
+        book = {
             'title': 'Lord of the Flies',
             'author': 'William Golding'
         }
+        # send a POST request to the add_book endpoint with the book data - regular user
+        response = self.app.post('http://localhost:5000/api/books', data=json.dumps(book), headers=self.headers, auth=self.auth)
+        print(response.text)
 
-    def test_add_book(self):
-        # send a POST request to the add_book endpoint with the book data
-        response = self.app.post('http://localhost:5000/api/books', data=json.dumps(self.book), headers=self.headers)
+        # check that the response status code is 401 - Unauthorized access. Admin rights required
+        self.assertEqual(response.status_code, 401)
+
+        # send a POST request to the add_book endpoint with the book data - admin user
+        response = self.app.post('http://localhost:5000/api/books', data=json.dumps(book), headers=self.headers, auth=self.auth_admin)
+        print(response.text)
 
         # check that the response status code is 201 (created)
         self.assertEqual(response.status_code, 201)
 
         # check that the response data contains the added book
         data = json.loads(response.get_data(as_text=True))
-        self.assertEqual(data['title'], self.book['title'])
-        self.assertEqual(data['author'], self.book['author'])
+        self.assertEqual(data['title'], book['title'])
+        self.assertEqual(data['author'], book['author'])
 
     def test_add_multiple_books(self):
+        # Test to allow admin add multiple books
         # Arrange
         books = [
             {'title': 'Harry Potter1', 'author': 'J K Rowling'},
@@ -39,7 +51,7 @@ class BookTestCase(unittest.TestCase):
 
         # Act
         for book in books:
-            response = self.app.post('http://localhost:5000/api/books', data=json.dumps(book), headers=self.headers)
+            response = self.app.post('http://localhost:5000/api/books', data=json.dumps(book), headers=self.headers, auth=self.auth_admin)
             print(response.text)
             print(response.request.url)
 
