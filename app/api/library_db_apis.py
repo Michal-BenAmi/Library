@@ -1,53 +1,8 @@
 import re
 
-from flask import request, make_response, jsonify, g
-
+from flask import request, make_response, jsonify
+from app.utils.authentication import get_current_user, get_user_book_count, admin_required, authenticate
 from src.library_db_schema import *
-from functools import wraps
-
-
-def admin_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        username = request.authorization.username
-        user = User.query.filter_by(username=username).first()
-        is_admin = user.is_admin
-        if not is_admin:
-            return make_response(jsonify({'message': 'Unauthorized access. Admin rights required.'}), 401)
-        return f(*args, **kwargs)
-    return decorated
-
-
-def authenticate_user(username, password):
-    user = User.query.filter_by(username=username).first()
-    if user and user.check_password(password):
-        return user
-    return None
-
-
-def authenticate(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        user = get_current_user()
-        g.user = user.id
-        if 'user_id' in kwargs and g.user != kwargs['user_id']:
-            return jsonify({'message': 'Unauthorized access. Different user.'}), 401
-        return f(*args, **kwargs)
-    return decorated
-
-
-def get_current_user():
-    auth = request.authorization
-    if not auth or not authenticate_user(auth.username, auth.password):
-        return jsonify({'message': 'Unauthorized access'}), 401
-    user = User.query.filter_by(username=auth.username).first()
-    g.user = user.id
-    return user
-
-
-def get_user_book_count(user_id):
-    checkout_count = Checkout.query.filter_by(user_id=user_id).count()
-    return checkout_count
 
 
 # API to register a new user
@@ -95,7 +50,7 @@ def delete_user(user_id):
     except:
         return make_response("Error removing user", 500)
 
-
+#
 # API to get all books in the catalog. filter by author/title/is_available
 @app.route('/api/books', methods=['GET'])
 def get_books():
@@ -160,8 +115,8 @@ def remove_book(book_id):
         return make_response(book_schema.jsonify(book), 200)
     except:
         return make_response("Error removing book", 500)
-
-
+#
+#
 # API to checkout book for user
 @app.route('/api/checkout', methods=['POST'])
 @auth.login_required
@@ -298,14 +253,3 @@ def get_user_id_fines(user_id):
 def get_my_fines():
     user = get_current_user()
     return get_user_fines(user.id)
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-
-        # db.session.remove()
-        # db.drop_all()
-    app.run(debug=True)
-
-

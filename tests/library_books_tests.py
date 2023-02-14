@@ -2,7 +2,7 @@ import unittest
 import json
 
 import requests
-from src import library_db_apis
+from app.api import library_db_apis
 
 
 class BookTestCase(unittest.TestCase):
@@ -52,6 +52,8 @@ class BookTestCase(unittest.TestCase):
         # Act
         for book in books:
             response = self.app.post('http://localhost:5000/api/books', data=json.dumps(book), headers=self.headers, auth=self.auth_admin)
+            print(response)
+            print(response.request.url)
             print(response.text)
             print(response.request.url)
 
