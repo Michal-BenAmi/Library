@@ -1,12 +1,12 @@
 import unittest
 import json
-from app.api import library_db_apis
+from app.api import library_apis
 
 
 class CheckoutTestCase(unittest.TestCase):
     def setUp(self):
         # Create test client
-        self.app = library_db_apis.app.test_client()
+        self.app = library_apis.app.test_client()
         self.headers = {
             'Content-Type': 'application/json'
         }

@@ -1,6 +1,6 @@
 from flask import request, make_response, jsonify, g
 
-from src.library_db_schema import *
+from app.api.library_db_schema import User, Checkout
 from functools import wraps
 
 

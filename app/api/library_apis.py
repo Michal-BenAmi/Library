@@ -1,12 +1,12 @@
 import re
 
 from flask import request, make_response, jsonify
+from app.api.library_db_schema import *
 from app.utils.authentication import get_current_user, get_user_book_count, admin_required, authenticate
-from src.library_db_schema import *
 
 
-# API to register a new user
-@app.route('/api/register', methods=['POST'])
+# API endpoint to register a new user
+@app.route('/api/users', methods=['POST'])
 def register():
     if 'username' not in request.json:
         return make_response(({'error': 'Missing required parameter: username'}), 400)
@@ -50,8 +50,8 @@ def delete_user(user_id):
     except:
         return make_response("Error removing user", 500)
 
-#
-# API to get all books in the catalog. filter by author/title/is_available
+
+# API endpoint to get all books in the catalog. filter by author/title/is_available
 @app.route('/api/books', methods=['GET'])
 def get_books():
     author = request.args.get('author', '').strip()
@@ -71,7 +71,7 @@ def get_books():
     return make_response(books_schema.jsonify(books), 200)
 
 
-# API to get a book details
+# API endpoint to get a book details
 @app.route('/api/books/<int:book_id>', methods=['GET'])
 def get_book(book_id):
     book = Book.query.get(book_id)
@@ -80,7 +80,7 @@ def get_book(book_id):
     return make_response(book_schema.jsonify(book), 200)
 
 
-# API to add a new book
+# API endpoint to add a new book
 @app.route('/api/books', methods=['POST'])
 @auth.login_required
 @admin_required
@@ -115,9 +115,9 @@ def remove_book(book_id):
         return make_response(book_schema.jsonify(book), 200)
     except:
         return make_response("Error removing book", 500)
-#
-#
-# API to checkout book for user
+
+
+# API endpoint to checkout book for user
 @app.route('/api/checkout', methods=['POST'])
 @auth.login_required
 def checkout_book():
@@ -153,7 +153,7 @@ def checkout_book():
         return make_response("Error checking out book", 500)
 
 
-# API to return a book from user
+# API endpoint to return a book from user
 @app.route('/api/checkouts/<int:book_id>', methods=['PUT'])
 @auth.login_required
 def return_book(book_id):

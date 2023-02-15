@@ -1,5 +1,5 @@
 
-from app.api.library_db_apis import app, db
+from app.api.library_apis import app, db
 
 if __name__ == '__main__':
 

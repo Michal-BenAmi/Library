@@ -1,17 +1,17 @@
 import unittest
 import json
 
-from app.api import library_db_apis
+from app.api import library_apis
 
 
 class TestRegisterAPI(unittest.TestCase):
     def setUp(self):
-        self.app = library_db_apis.app.test_client()
+        self.app = library_apis.app.test_client()
         self.headers = {
             'Content-Type': 'application/json'
         }
 
-    def test_register_api(self):
+    def test_users_register_api(self):
         user = {
             "username": "Shiri Cohen",
             "email": "ShiriCohen@gmail.com",
@@ -19,7 +19,7 @@ class TestRegisterAPI(unittest.TestCase):
         }
 
         # Send a POST request to the API with the user data
-        response = self.app.post("http://localhost:5000/api/register", headers=self.headers, data=json.dumps(user))
+        response = self.app.post("http://localhost:5000/api/users", headers=self.headers, data=json.dumps(user))
 
         # Check that the API returns a 201 status code, indicating that the user has been successfully registered
         self.assertEqual(response.status_code, 201)
@@ -28,7 +28,7 @@ class TestRegisterAPI(unittest.TestCase):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.json, {'message': 'User created successfully'})
 
-    def test_register_multiple_users(self):
+    def test_users_register_multiple_users(self):
         users = [
             {
                 "username": "Joni Levy",
@@ -60,7 +60,7 @@ class TestRegisterAPI(unittest.TestCase):
 
         for user in users:
             # Send a POST request to the API with the user data
-            response = self.app.post("http://localhost:5000/api/register", headers=self.headers, data=json.dumps(user))
+            response = self.app.post("http://localhost:5000/api/users", headers=self.headers, data=json.dumps(user))
 
             # Check that the API returns a 201 status code, indicating that the user has been successfully registered
             self.assertEqual(response.status_code, 201)
@@ -77,10 +77,10 @@ class TestRegisterAPI(unittest.TestCase):
         }
 
         # Send a POST request to the API with the user data
-        self.app.post("http://localhost:5000/api/register", headers=self.headers, data=json.dumps(user))
+        self.app.post("http://localhost:5000/api/users", headers=self.headers, data=json.dumps(user))
 
         # Try to register the same user again
-        response = self.app.post("http://localhost:5000/api/register", headers=self.headers, data=json.dumps(user))
+        response = self.app.post("http://localhost:5000/api/users", headers=self.headers, data=json.dumps(user))
 
         # Check that the API returns a 500 status code, indicating that the user already exists
         self.assertEqual(response.status_code, 500)
@@ -92,7 +92,7 @@ class TestRegisterAPI(unittest.TestCase):
         }
 
         # Try to register a user with missing information
-        response = self.app.post("http://localhost:5000/api/register", headers=self.headers, data=json.dumps(user))
+        response = self.app.post("http://localhost:5000/api/users", headers=self.headers, data=json.dumps(user))
 
         # Check that the API returns
         self.assertEqual(response.status_code, 400)
@@ -105,7 +105,7 @@ class TestRegisterAPI(unittest.TestCase):
         }
 
         # Try to register a user with missing information
-        response = self.app.post("http://localhost:5000/api/register", headers=self.headers, data=json.dumps(user))
+        response = self.app.post("http://localhost:5000/api/users", headers=self.headers, data=json.dumps(user))
 
         # Check that the API returns
         self.assertEqual(response.status_code, 400)
