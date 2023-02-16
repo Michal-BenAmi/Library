@@ -2,8 +2,8 @@
 library management system that stores the library catalog tracks book check-outs and check-ins, and tracks due dates and fines.
 
 ## Documentation
-see the [design doc](/docs/desing.md) for more details about the system
-see [APIs docs](docs/swagger.html) too  
+see the [design doc](/docs/design.md) for more details about the system
+see [APIs docs](https://app.swaggerhub.com/apis/mibenami/default-title/0.1) too  
 
 ## How to run
 ### use docker
