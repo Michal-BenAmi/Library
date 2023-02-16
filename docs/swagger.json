@@ -1,0 +1,964 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Library Management",
+    "description": "library management system that stores the library catalog tracks book check-outs and check-ins, and tracks due dates and fines\nSome useful links:\n- [The Library Management repository](https://github.com/Michal-BenAmi/Library)",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5000"
+    }
+  ],
+  "paths": {
+    "/api/checkouts": {
+      "get": {
+        "tags": [
+          "Checkouts"
+        ],
+        "summary": "Get all checkouts",
+        "description": "Get all checkouts",
+        "responses": {
+          "200": {
+            "description": "Checkouts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\n  \"checkouts\": [\n    {\n      \"book_id\": 1,\n      \"checkout_date\": \"Mon, 13 Feb 2023 00:00:00 GMT\",\n      \"checkout_id\": 1,\n      \"user_id\": 4,\n      \"user_name\": \"Joni Levy\"\n    }\n  ]\n}\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/checkouts/{book_id}": {
+      "put": {
+        "tags": [
+          "Checkouts"
+        ],
+        "summary": "Return a book from a user",
+        "description": "Return a book from a user",
+        "parameters": [
+          {
+            "name": "book_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "description": "ID of the book being returned"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/checkouts_book_id_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n\"book_id\": \"5\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Book returned successfully",
+            "content": {
+              "text/html; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/html; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/checkouts/me": {
+      "get": {
+        "tags": [
+          "Checkouts"
+        ],
+        "summary": "Checkout a book for a user",
+        "description": "Auto generated using Swagger Inspector",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\n  \"checkouts\": [\n    {\n      \"book_id\": 1,\n      \"checkout_date\": \"Mon, 13 Feb 2023 00:00:00 GMT\",\n      \"checkout_id\": 1,\n      \"user_id\": 4,\n      \"user_name\": \"Joni Levy\"\n    }\n  ]\n}\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/checkout": {
+      "post": {
+        "tags": [
+          "Checkouts"
+        ],
+        "summary": "Checkout a book for a user",
+        "description": "Checkout a book for a user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/api_checkout_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n\"book_id\": \"5\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Book checked out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_201"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\n  \"book_id\": \"5\",\n  \"checkout_date\": \"Mon, 13 Feb 2023 00:00:00 GMT\",\n  \"id\": 3,\n  \"user_id\": 8\n}\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/users/{user_id}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deletes a registered user",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "ID of the user to delete",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error deleting user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500"
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/books": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get all books in the catalog",
+        "description": "Get all books in the catalog, filtered by author/title/is_available",
+        "parameters": [
+          {
+            "name": "author",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Joseph%20Heller"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "4"
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Lord%20of%20the%20Flies"
+          },
+          {
+            "name": "is_available",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "example": "True"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation Get Books",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "value": "[\n  {\n    \"author\": \"William Golding\",\n    \"id\": 1,\n    \"is_available\": false,\n    \"title\": \"Lord of the Flies\"\n  },\n  {\n    \"author\": \"J K Rowling\",\n    \"id\": 2,\n    \"is_available\": true,\n    \"title\": \"Harry Potter2\"\n  }\n]\n"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basic": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Add a new book to the catalog",
+        "description": "Add a new book to the catalog only by Admin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/api_books_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n\"title\":\"Book_title\",\n\"author\":\"book_author\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation book added"
+          },
+          "500": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/books/{book_id}": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get book details",
+        "description": "Get book details",
+        "parameters": [
+          {
+            "name": "book_id",
+            "in": "path",
+            "description": "ID of the book",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfuly get book details",
+            "content": {
+              "text/html; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid book",
+            "content": {
+              "text/html; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Delete a book from the catalog",
+        "description": "Delete a book",
+        "parameters": [
+          {
+            "name": "book_id",
+            "in": "path",
+            "description": "ID of the book",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesfully removing a book",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Book doesnt exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error removing book",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500_1"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/register": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Registers a new user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/api_register_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n\"username\": \"Eti Cohen\",\n\"email\": \"EtiCohen@gmail.com\",\n\"password\": \"eticohen123\"\n}"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_201_1"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required parameter or invalid email format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error creating user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500_2"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/fines/me": {
+      "get": {
+        "tags": [
+          "Fines"
+        ],
+        "summary": "Get authenticated user's fines",
+        "description": "Retrieve the amount of fine owed by the authenticated user",
+        "responses": {
+          "200": {
+            "description": "Fine amount returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\n  \"fine_amount\": 0,\n  \"user_id\": 4\n}\n"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400_2"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    },
+    "/api/fines/{user_id}": {
+      "get": {
+        "tags": [
+          "Fines"
+        ],
+        "summary": "Get user's fines",
+        "description": "Retrieve the amount of fine owed by a user",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fine amount returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\n  \"fine_amount\": 0,\n  \"user_id\": 3\n}\n"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400_2"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://127.0.0.1:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://127.0.0.1:5000"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "inline_response_404": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "User not found"
+          }
+        }
+      },
+      "api_register_body": {
+        "required": [
+          "email",
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "The username of the new user"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email address of the new user",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "The password for the new user",
+            "format": "password"
+          },
+          "is_admin": {
+            "type": "boolean",
+            "description": "Indicates if the new user is an administrator"
+          }
+        }
+      },
+      "inline_response_200_1_checkouts": {
+        "type": "object",
+        "properties": {
+          "checkout_id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "user_name": {
+            "type": "string"
+          },
+          "book_id": {
+            "type": "integer"
+          },
+          "checkout_date": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_500_2": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Error creating user"
+          }
+        }
+      },
+      "inline_response_500_1": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Error removing book"
+          }
+        }
+      },
+      "api_checkout_body": {
+        "type": "object",
+        "properties": {
+          "book_id": {
+            "type": "string",
+            "description": "ID of the book being checked out"
+          }
+        }
+      },
+      "inline_response_200_1": {
+        "type": "object",
+        "properties": {
+          "checkouts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/inline_response_200_1_checkouts"
+            }
+          }
+        }
+      },
+      "inline_response_201": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID of the checkout"
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "ID of the user checking out the book"
+          },
+          "book_id": {
+            "type": "integer",
+            "description": "ID of the book being checked out"
+          },
+          "checkout_date": {
+            "type": "string",
+            "description": "Date and time of checkout",
+            "format": "date-time"
+          }
+        }
+      },
+      "api_books_body": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "checkouts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/inline_response_200_checkouts"
+            }
+          }
+        }
+      },
+      "inline_response_201_1": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User created successfully"
+          }
+        }
+      },
+      "inline_response_200_2": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "description": "ID of the user"
+          },
+          "fine_amount": {
+            "type": "number",
+            "description": "Amount of fine owed",
+            "format": "double"
+          }
+        }
+      },
+      "inline_response_200_checkouts": {
+        "type": "object",
+        "properties": {
+          "checkout_id": {
+            "type": "integer",
+            "description": "ID of the checkout"
+          },
+          "book_id": {
+            "type": "integer",
+            "description": "ID of the book being checked out"
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "ID of the user checking out the book"
+          },
+          "user_name": {
+            "type": "string",
+            "description": "Name of the user checking out the book"
+          },
+          "checkout_date": {
+            "type": "string",
+            "description": "Date and time of checkout",
+            "format": "date-time"
+          }
+        }
+      },
+      "checkouts_book_id_body": {
+        "type": "object",
+        "properties": {
+          "book_id": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_500": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Error deleting user"
+          }
+        }
+      },
+      "inline_response_400_2": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_400": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Book doesnt exist"
+          }
+        }
+      },
+      "inline_response_400_1": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Missing required parameter username"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basic": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
