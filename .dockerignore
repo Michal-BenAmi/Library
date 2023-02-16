@@ -1,0 +1,5 @@
+# exclude md files
+*.md
+
+# exclude test directory
+/tests
