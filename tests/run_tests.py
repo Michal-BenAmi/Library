@@ -8,9 +8,10 @@ checkout_tests = unittest.TestLoader().discover('.', pattern='library_checkout_t
 # Create a test suite from all the tests
 suite = unittest.TestSuite([register_tests, books_tests, checkout_tests])
 
-# Run the test suite
-unittest.TextTestRunner().run(suite)
+def run_tests():
+    # Run the test suite
+    unittest.TextTestRunner().run(suite)
 
 
-# if __name__ == '__main__':
-#     run_tests()
+if __name__ == '__main__':
+    run_tests()

@@ -117,18 +117,6 @@ class TestRegisterAPI(unittest.TestCase):
         # Unauthorized Access
         self.assertEqual(response.status_code, 401)
 
-    # def test_delete_user_by_admin(self):
-    #
-    #     # Test deleting user by admin
-    #     auth_admin = ('Rivka Gim', 'RivkaGim12345')
-    #     response = self.app.delete('/api/users/2', headers=self.headers, auth=auth_admin)
-    #     self.assertEqual(response.status_code, 204)
-    #
-    #     # Test user not found
-    #     response = self.app.delete('/api/users/2', headers=self.headers, auth=auth_admin)
-    #     self.assertEqual(response.status_code, 404)
-    #     self.assertEqual(response.text, 'User not found')
-
 
 if __name__ == '__main__':
     unittest.main()

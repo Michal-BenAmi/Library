@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from flask import Flask
 from flask_oauthlib.provider import OAuth2Provider
@@ -11,9 +12,8 @@ auth = HTTPBasicAuth()
 
 app = Flask(__name__)
 config = configparser.ConfigParser()
-config.read('config/config.cfg')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://libuser:library123@localhost/library_management'
-# app.config['SQLALCHEMY_DATABASE_URI'] = config['DATABASE']['SQLALCHEMY_DATABASE_URI']
+config.read(os.path.join(os.path.dirname(__file__), '../../', 'config', 'config.cfg'))
+app.config['SQLALCHEMY_DATABASE_URI'] = config['DATABASE']['SQLALCHEMY_DATABASE_URI']
 db = SQLAlchemy(app)
 oauth = OAuth2Provider(app)
 ma = Marshmallow(app)

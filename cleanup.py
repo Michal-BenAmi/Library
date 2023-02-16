@@ -5,4 +5,5 @@ if __name__ == '__main__':
 
         db.session.remove()
         db.drop_all()
-    # app.run(debug=True)
+        db.create_all()
+
